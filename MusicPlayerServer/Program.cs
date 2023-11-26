@@ -17,7 +17,7 @@ var authenticationGroup = app.MapGroup("/authentication");
 authenticationGroup.MapPost("/signup", Authentication.SignUp);
 authenticationGroup.MapPost("/signin", Authentication.SignIn);
 
-var apiGroup = app.MapGroup("/api");
+var apiGroup = app.MapGroup("/api").AddEndpointFilter(Authorization.RequiresSignIn);
 
 apiGroup.MapGet("/get_liked_songs", RequestHandlers.GetLikedSongs);
 apiGroup.MapGet("/get_own_songs", RequestHandlers.GetOwnSongs);

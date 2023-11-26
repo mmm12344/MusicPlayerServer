@@ -12,6 +12,11 @@ namespace MusicPlayerServer
             int userID;
             using(var context = new MusicPlayerServerContext())
             {
+                var currentUsers = context.Users.Where(u => u.Email == user.Email).ToList();
+                if(currentUsers.Count() > 0)
+                {
+                    return Results.Problem();
+                }
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
                 var addedUser = context.Users.Where(u => u.Email == user.Email).FirstOrDefault();
@@ -26,6 +31,10 @@ namespace MusicPlayerServer
             using(var context = new MusicPlayerServerContext())
             {
                 var userFound = context.Users.Where(u => u.Email == user.Email).FirstOrDefault();
+                if(userFound == null) 
+                {
+                    return Results.Problem();
+                }
                 userID = userFound.UserID;
             }
             return Results.Ok(userID);
