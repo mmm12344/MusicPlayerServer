@@ -26,6 +26,7 @@ namespace MusicPlayerServer.Models
 
         public int Likes { get; set; }
 
+        public byte[]? Picture { get; set; }
         
         public int UserID { get; set; }
         public User User { get; set; }
