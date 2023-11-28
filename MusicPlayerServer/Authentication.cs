@@ -5,6 +5,7 @@ using MusicPlayerServer.Models;
 
 namespace MusicPlayerServer
 {
+    public record UserSignIn(string email, string password);
     public class Authentication
     {
         public static async Task<IResult> SignUp(User user)
@@ -25,12 +26,16 @@ namespace MusicPlayerServer
             return Results.Ok(userID);
         }
 
-        public static async Task<IResult> SignIn(User user)
+        public static async Task<IResult> SignIn(UserSignIn user)
         {
             int userID;
             using(var context = new MusicPlayerServerContext())
             {
-                var userFound = context.Users.Where(u => u.Email == user.Email).FirstOrDefault();
+                var usersFound = from u
+                                in context.Users
+                                where u.Email == user.email && u.Password == user.password
+                                select u;
+                var userFound = usersFound.FirstOrDefault();
                 if(userFound == null) 
                 {
                     return Results.Problem();
