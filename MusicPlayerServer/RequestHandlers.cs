@@ -100,7 +100,7 @@ namespace MusicPlayerServer
         public static async Task<IResult> AddSong(Song song)
         {
             //var context = new MusicPlayerServerContext();
-
+            song.Likes = 0;
             context.Songs.AddAsync(song);
             context.SaveChanges();
 

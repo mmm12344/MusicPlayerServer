@@ -24,7 +24,7 @@ namespace MusicPlayerServer.Models
         [Required]
         public byte[] File { get; set; }
 
-        public int Likes { get; set; }
+        public int? Likes { get; set; }
 
         public byte[]? Picture { get; set; }
         
