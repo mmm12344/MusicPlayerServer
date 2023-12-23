@@ -8,7 +8,7 @@ using System.Security.Cryptography.Xml;
 namespace MusicPlayerServer
 {
     public record AddSongRecord(string name, byte[] file, byte[] picture);
-    public record AddPlaylistRecord(string name);
+    public record AddPlaylistRecord(string name, byte[] picture);
     public class RequestHandlers
     {
         private static MusicPlayerServerContext context = new MusicPlayerServerContext();
@@ -22,7 +22,8 @@ namespace MusicPlayerServer
                         select new 
                         { 
                             userLikes.SongID ,
-                            userLikes.Song.Name 
+                            userLikes.Song.Name,
+                            userLikes.Song.Picture
                         };
             return Results.Ok(query);
         }
@@ -38,7 +39,8 @@ namespace MusicPlayerServer
                     select new
                     {
                         songs.SongID,
-                        songs.Name
+                        songs.Name,
+                        songs.Picture
                     };
             return Results.Ok(query);
         }
@@ -51,7 +53,8 @@ namespace MusicPlayerServer
                     select new
                     {
                         songs.SongID,
-                        songs.Name
+                        songs.Name,
+                        songs.Picture
                     };
             return Results.Ok(query);
         }
@@ -66,7 +69,8 @@ namespace MusicPlayerServer
                     select new
                     {
                         songs.SongID,
-                        songs.Name
+                        songs.Name,
+                        songs.Picture
                     };
             return Results.Ok(query);
         }
@@ -82,7 +86,8 @@ namespace MusicPlayerServer
                     select new
                     {
                         playlist.PlaylistID,
-                        playlist.Name
+                        playlist.Name,
+                        playlist.Picture
                     };
 
             return Results.Ok(query);
@@ -99,7 +104,8 @@ namespace MusicPlayerServer
                         select new
                         {
                             songPlaylist.SongID,
-                            songPlaylist.Song.Name
+                            songPlaylist.Song.Name,
+                            songPlaylist.Song.Picture
                         };
 
             return Results.Ok(query);
@@ -122,7 +128,7 @@ namespace MusicPlayerServer
         {
 
             int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
-            Playlist playlist = new Playlist { Name = playlistToAdd.name, UserID = userID };
+            Playlist playlist = new Playlist { Name = playlistToAdd.name, Picture = playlistToAdd.picture, UserID = userID };
 
             await context.Playlists.AddAsync(playlist);
             context.SaveChanges();
@@ -174,7 +180,14 @@ namespace MusicPlayerServer
             var query = from song
                     in context.Songs
                     where song.SongID == songID
-                    select song;
+                    select new
+                    {
+                        song.SongID,
+                        song.Name,
+                        song.File,
+                        song.Likes,
+                        song.Picture
+                    };
 
             return Results.Ok(query);
         }

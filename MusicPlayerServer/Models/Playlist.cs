@@ -18,6 +18,8 @@ namespace MusicPlayerServer.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
+        public byte[]? Picture { get; set; }
+
         
         public int UserID { get; set; }
         public User User { get; set; }
