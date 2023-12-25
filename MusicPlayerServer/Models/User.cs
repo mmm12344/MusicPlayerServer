@@ -34,8 +34,6 @@ namespace MusicPlayerServer.Models
         public string Password { get; set; }
 
 
-        public byte[]? Picture { get; set; }
-
         public ICollection<Song> Songs { get; set; }
         public ICollection<Playlist> Playlists { get; set; }
         public ICollection<UserLikes> LikedSongs { get; set; }

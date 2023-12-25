@@ -6,6 +6,7 @@ using MusicPlayerServer.Models;
 namespace MusicPlayerServer
 {
     public record UserSignIn(string email, string password);
+
     public class Authentication
     {
         public static async Task<IResult> SignUp(User user)
