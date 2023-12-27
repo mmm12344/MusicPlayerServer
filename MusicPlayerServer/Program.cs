@@ -37,6 +37,8 @@ apiGroup.MapGet("/get_playlist_songs/{playlistID}", RequestHandlers.GetPlayListS
 apiGroup.MapGet("/delete_song/{songID}", RequestHandlers.DeleteSong);
 apiGroup.MapGet("/add_like_to_song/{songID}", RequestHandlers.AddLikeToSong);
 apiGroup.MapGet("/get_song/{songID}", RequestHandlers.GetSong);
+apiGroup.MapGet("/is_liked/{songID}", RequestHandlers.IsLiked);
+apiGroup.MapGet("/get_own_playlists", RequestHandlers.GetOwnPlaylists);
 
 apiGroup.MapPost("/add_song", RequestHandlers.AddSong);
 apiGroup.MapPost("/add_playlist", RequestHandlers.AddPlaylist);

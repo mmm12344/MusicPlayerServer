@@ -75,14 +75,28 @@ namespace MusicPlayerServer
             return Results.Ok(query);
         }
 
-        public static async Task<IResult> GetAllPlaylists(HttpContext httpContext)
+        public static async Task<IResult> GetAllPlaylists()
         {
-            
+
+            var query = from playlist
+                    in context.Playlists
+                    select new
+                    {
+                        playlist.PlaylistID,
+                        playlist.Name,
+                        playlist.Picture
+                    };
+
+            return Results.Ok(query);
+        }
+
+        public static async Task<IResult> GetOwnPlaylists(HttpContext httpContext)
+        {
             int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
 
             var query = from playlist
                     in context.Playlists
-                    where playlist.UserID == userID
+                    where playlist.PlaylistID == userID
                     select new
                     {
                         playlist.PlaylistID,
@@ -166,6 +180,15 @@ namespace MusicPlayerServer
 
             int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
 
+            var query = from userLike
+                        in context.UserLikes
+                        where userLike.UserID == userID && userLike.SongID == songID
+                        select userLike;
+            if(query.Count() > 0)
+            {
+                return Results.Ok();
+            }
+
             UserLikes entry = new UserLikes { SongID = songID, UserID = userID };
             await context.UserLikes.AddAsync(entry);
             context.SaveChanges();
@@ -175,8 +198,6 @@ namespace MusicPlayerServer
 
         public static async Task<IResult> GetSong(int songID)
         {
-
-
             var query = from song
                     in context.Songs
                     where song.SongID == songID
@@ -189,7 +210,21 @@ namespace MusicPlayerServer
                         song.Picture
                     };
 
-            return Results.Ok(query);
+            return Results.Ok(query.FirstOrDefault());
+        }
+
+        public static async Task<IResult> IsLiked(int songID, HttpContext httpContext)
+        {
+            int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
+            var query = from userLikes
+                        in context.UserLikes
+                        where userLikes.SongID == songID && userLikes.UserID == userID
+                        select userLikes;
+
+            if (query.Count() == 0)
+                return Results.Ok(false);
+            return Results.Ok(true);
+
         }
 
 
