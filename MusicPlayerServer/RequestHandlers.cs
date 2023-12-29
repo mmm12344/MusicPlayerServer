@@ -96,7 +96,7 @@ namespace MusicPlayerServer
 
             var query = from playlist
                     in context.Playlists
-                    where playlist.PlaylistID == userID
+                    where playlist.UserID == userID
                     select new
                     {
                         playlist.PlaylistID,
@@ -150,11 +150,20 @@ namespace MusicPlayerServer
             return Results.Ok();
         }
 
-        public static async Task<IResult> AddSongToPlaylist(SongPlaylist songPlaylist)
+        public static async Task<IResult> AddSongToPlaylist(SongPlaylist songplaylist)
         {
 
+            var query = from songPlaylist
+                        in context.SongPlaylists
+                        where songPlaylist.PlaylistID == songplaylist.SongID && songPlaylist.PlaylistID == songplaylist.PlaylistID
+                        select songPlaylist;
+            if (query.Count() > 0)
+            {
+                return Results.Problem();
+            }
 
-            await context.SongPlaylists.AddAsync(songPlaylist);
+
+            await context.SongPlaylists.AddAsync(songplaylist);
             context.SaveChanges();
 
             return Results.Ok();
