@@ -236,6 +236,22 @@ namespace MusicPlayerServer
 
         }
 
+        public static async Task<IResult> RemoveLike(int songID, HttpContext httpContext)
+        {
+            int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
+            var query = from userLikes
+                        in context.UserLikes
+                        where userLikes.SongID == songID && userLikes.UserID == userID
+                        select userLikes;
+            if(query.Count() == 0)
+            {
+                return Results.Problem();
+            }
+            context.UserLikes.Remove(query.FirstOrDefault());
+            context.SaveChanges();
+            return Results.Ok(true);
+        }
+
 
     }
 }
