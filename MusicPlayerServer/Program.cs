@@ -25,6 +25,7 @@ var authenticationGroup = app.MapGroup("/authentication");
 
 authenticationGroup.MapPost("/signup", Authentication.SignUp);
 authenticationGroup.MapPost("/signin", Authentication.SignIn);
+authenticationGroup.MapPost("/change_user_info", Authentication.ChangeUserInfo);
 
 var apiGroup = app.MapGroup("/api").AddEndpointFilter(Authorization.RequiresSignIn);
 
