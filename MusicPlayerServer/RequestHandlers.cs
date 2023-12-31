@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp;
 using MusicPlayerServer.Models;
 using NuGet.Protocol;
 using System.Net.Http;
@@ -61,18 +62,40 @@ namespace MusicPlayerServer
 
         public static async Task<IResult> Search(string songName)
         {
-            string[] songKeyWords = songName.Split("_");
-            
+            string[] songKeyWords = songName.Split(" ");
+
             var query = from songs
                     in context.Songs
-                    where songKeyWords.Contains(songName)
-                    select new
+
+                        select songs;
+                    
+            Dictionary<Song, int> songResultWeight = new();
+            
+            foreach(Song song in query)
+            {
+                int weight = 0;
+                foreach (string word in songKeyWords)
+                { 
+                    if (song.Name.Contains(word))
                     {
-                        songs.SongID,
-                        songs.Name,
-                        songs.Picture
-                    };
-            return Results.Ok(query);
+                        weight++; 
+                    }
+                    
+                }
+                if(weight != 0)
+                    songResultWeight.Add(song, weight);
+            }
+
+            songResultWeight.OrderBy(s => s.Value);
+
+            List<Song> songResults = new List<Song>();
+
+            for(int i = songResultWeight.Count()-1; i >= 0; i--)
+            {
+                songResults.Add(songResultWeight.ElementAt(i).Key);
+            }
+
+            return Results.Ok(songResults);
         }
 
         public static async Task<IResult> GetAllPlaylists()
