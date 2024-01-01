@@ -10,6 +10,8 @@ namespace MusicPlayerServer
 {
     public record AddSongRecord(string name, byte[] file, byte[] picture);
     public record AddPlaylistRecord(string name, byte[] picture);
+
+    public record SongInfo(int songID, string name, byte[] picture);
     public class RequestHandlers
     {
         private static MusicPlayerServerContext context = new MusicPlayerServerContext();
@@ -88,11 +90,12 @@ namespace MusicPlayerServer
 
             songResultWeight.OrderBy(s => s.Value);
 
-            List<Song> songResults = new List<Song>();
+            List<SongInfo> songResults = new List<SongInfo>();
 
             for(int i = songResultWeight.Count()-1; i >= 0; i--)
             {
-                songResults.Add(songResultWeight.ElementAt(i).Key);
+                var song = songResultWeight.ElementAt(i).Key;
+                songResults.Add(new SongInfo(song.SongID, song.Name, song.Picture));
             }
 
             return Results.Ok(songResults);
