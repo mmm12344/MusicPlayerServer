@@ -140,7 +140,7 @@ namespace MusicPlayerServer
 
             var query = from songPlaylist
                         in context.SongPlaylists
-                        where songPlaylist.PlaylistID == playlistID && songPlaylist.Playlist.UserID == userID
+                        where songPlaylist.PlaylistID == playlistID
                         select new
                         {
                             songPlaylist.SongID,
