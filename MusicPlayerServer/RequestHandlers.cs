@@ -28,7 +28,7 @@ namespace MusicPlayerServer
                             userLikes.Song.Name,
                             userLikes.Song.Picture
                         };
-            return Results.Ok(query);
+            return Results.Ok(query.Reverse());
         }
 
         public static async Task<IResult> GetOwnSongs(HttpContext httpContext)
@@ -45,7 +45,7 @@ namespace MusicPlayerServer
                         songs.Name,
                         songs.Picture
                     };
-            return Results.Ok(query);
+            return Results.Ok(query.Reverse());
         }
 
         public static async Task<IResult> GetAllSongs()
@@ -59,7 +59,7 @@ namespace MusicPlayerServer
                         songs.Name,
                         songs.Picture
                     };
-            return Results.Ok(query);
+            return Results.Ok(query.Reverse());
         }
 
         public static async Task<IResult> Search(string songName)
@@ -113,7 +113,7 @@ namespace MusicPlayerServer
                         playlist.Picture
                     };
 
-            return Results.Ok(query);
+            return Results.Ok(query.Reverse());
         }
 
         public static async Task<IResult> GetOwnPlaylists(HttpContext httpContext)
@@ -130,7 +130,7 @@ namespace MusicPlayerServer
                         playlist.Picture
                     };
 
-            return Results.Ok(query);
+            return Results.Ok(query.Reverse());
         }
 
         public static async Task<IResult> GetPlayListSongs(int playlistID, HttpContext httpContext)
@@ -148,7 +148,7 @@ namespace MusicPlayerServer
                             songPlaylist.Song.Picture
                         };
 
-            return Results.Ok(query);
+            return Results.Ok(query.Reverse());
         }
 
         public static async Task<IResult> AddSong(AddSongRecord songToAdd, HttpContext httpContext)
@@ -195,20 +195,6 @@ namespace MusicPlayerServer
             return Results.Ok();
         }
 
-        public static async Task<IResult> DeleteSong(int songID, HttpContext httpContext)
-        {
-
-            int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
-
-            var query = from song
-                        in context.Songs
-                        where song.SongID == songID && song.UserID == userID
-                        select song;
-            context.Songs.Remove(query.FirstOrDefault());
-            context.SaveChanges();
-
-            return Results.Ok();
-        }
 
         public static async Task<IResult> AddLikeToSong(int songID, HttpContext httpContext)
         {
@@ -274,6 +260,22 @@ namespace MusicPlayerServer
                 return Results.Problem();
             }
             context.UserLikes.Remove(query.FirstOrDefault());
+            context.SaveChanges();
+            return Results.Ok(true);
+        }
+
+        public static async Task<IResult> DeleteSong(int songID, HttpContext httpContext)
+        {
+            int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
+            var query = from song
+                        in context.Songs
+                        where song.UserID == userID && song.SongID == songID
+                        select song;
+            if(query.Count() == 0)
+            {
+                return Results.Problem();
+            }
+            context.Songs.Remove(query.FirstOrDefault());
             context.SaveChanges();
             return Results.Ok(true);
         }
