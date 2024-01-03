@@ -280,6 +280,37 @@ namespace MusicPlayerServer
             return Results.Ok(true);
         }
 
+        public static async Task<IResult> RemoveSongFromPlaylist(SongPlaylist songplaylist, HttpContext httpContext)
+        {
+            int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
+            var query = from songPlaylist
+                        in context.SongPlaylists
+                        where songPlaylist.Playlist.UserID == userID && songPlaylist.SongID == songplaylist.SongID && songPlaylist.PlaylistID == songplaylist.PlaylistID
+                        select songplaylist;
+            if (query.Count() == 0)
+            {
+                return Results.Problem();
+            }
+            context.SongPlaylists.Remove(query.FirstOrDefault());
+            context.SaveChanges();
+            return Results.Ok(true);
+        }
+
+        public static async Task<IResult> DeletePlaylist(int playlistID, HttpContext httpContext)
+        {
+            int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
+            var query = from playlist
+                        in context.Playlists
+                        where playlist.UserID == userID && playlist.PlaylistID == playlistID
+                        select playlist;
+            if (query.Count() == 0)
+            {
+                return Results.Problem();
+            }
+            context.Playlists.Remove(query.FirstOrDefault());
+            context.SaveChanges();
+            return Results.Ok(true);
+        }
 
     }
 }
