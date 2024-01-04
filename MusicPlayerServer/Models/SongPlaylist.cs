@@ -14,11 +14,11 @@ namespace MusicPlayerServer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SongPlaylistID { get; set; }
 
-      
+        [ForeignKey("Song")]
         public int SongID { get; set; }
         public Song Song { get; set; }
 
-        
+        [ForeignKey("Playlist")]
         public int PlaylistID { get; set; }
         public Playlist Playlist { get; set; }
     }

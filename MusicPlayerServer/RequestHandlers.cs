@@ -22,13 +22,14 @@ namespace MusicPlayerServer
             var query = from userLikes
                         in context.UserLikes
                         where userLikes.UserID == userID
+                        orderby userLikes.UserID descending
                         select new 
                         { 
                             userLikes.SongID ,
                             userLikes.Song.Name,
                             userLikes.Song.Picture
                         };
-            return Results.Ok(query.Reverse());
+            return Results.Ok(query);
         }
 
         public static async Task<IResult> GetOwnSongs(HttpContext httpContext)
@@ -39,13 +40,14 @@ namespace MusicPlayerServer
             var query = from songs
                     in context.Songs
                     where songs.UserID == userID
+                    orderby songs.UserID descending
                     select new
                     {
                         songs.SongID,
                         songs.Name,
                         songs.Picture
                     };
-            return Results.Ok(query.Reverse());
+            return Results.Ok(query);
         }
 
         public static async Task<IResult> GetAllSongs()
@@ -53,13 +55,14 @@ namespace MusicPlayerServer
         
             var query = from songs
                     in context.Songs
+                    orderby songs.SongID descending
                     select new
                     {
                         songs.SongID,
                         songs.Name,
                         songs.Picture
                     };
-            return Results.Ok(query.Reverse());
+            return Results.Ok(query);
         }
 
         public static async Task<IResult> Search(string songName)
@@ -106,6 +109,7 @@ namespace MusicPlayerServer
 
             var query = from playlist
                     in context.Playlists
+                    orderby playlist.PlaylistID descending
                     select new
                     {
                         playlist.PlaylistID,
@@ -113,7 +117,7 @@ namespace MusicPlayerServer
                         playlist.Picture
                     };
 
-            return Results.Ok(query.Reverse());
+            return Results.Ok(query);
         }
 
         public static async Task<IResult> GetOwnPlaylists(HttpContext httpContext)
@@ -122,6 +126,7 @@ namespace MusicPlayerServer
 
             var query = from playlist
                     in context.Playlists
+                    orderby playlist.PlaylistID descending
                     where playlist.UserID == userID
                     select new
                     {
@@ -130,7 +135,7 @@ namespace MusicPlayerServer
                         playlist.Picture
                     };
 
-            return Results.Ok(query.Reverse());
+            return Results.Ok(query);
         }
 
         public static async Task<IResult> GetPlayListSongs(int playlistID, HttpContext httpContext)
@@ -148,7 +153,7 @@ namespace MusicPlayerServer
                             songPlaylist.Song.Picture
                         };
 
-            return Results.Ok(query.Reverse());
+            return Results.Ok(query);
         }
 
         public static async Task<IResult> AddSong(AddSongRecord songToAdd, HttpContext httpContext)
@@ -188,8 +193,9 @@ namespace MusicPlayerServer
                 return Results.Problem();
             }
 
+            SongPlaylist entry = new SongPlaylist { PlaylistID = songplaylist.PlaylistID, SongID = songplaylist.SongID };
 
-            await context.SongPlaylists.AddAsync(songplaylist);
+            await context.SongPlaylists.AddAsync(entry);
             context.SaveChanges();
 
             return Results.Ok();
@@ -285,14 +291,19 @@ namespace MusicPlayerServer
             int userID = Convert.ToInt32(Authorization.GetCookie("userID", httpContext));
             var query = from songPlaylist
                         in context.SongPlaylists
-                        where songPlaylist.Playlist.UserID == userID && songPlaylist.SongID == songplaylist.SongID && songPlaylist.PlaylistID == songplaylist.PlaylistID
-                        select songplaylist;
+                        where songPlaylist.SongID == songplaylist.SongID && songPlaylist.PlaylistID == songplaylist.PlaylistID && songPlaylist.Playlist.UserID == userID
+                        select songPlaylist;
+           
+
             if (query.Count() == 0)
             {
                 return Results.Problem();
             }
-            context.SongPlaylists.Remove(query.FirstOrDefault());
-            context.SaveChanges();
+            if (query.FirstOrDefault() != null)
+            {
+                context.SongPlaylists.Remove(query.FirstOrDefault());
+                context.SaveChanges();
+            }
             return Results.Ok(true);
         }
 

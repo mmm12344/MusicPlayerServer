@@ -15,6 +15,14 @@ namespace MusicPlayerServer.Models
         public DbSet<SongPlaylist> SongPlaylists { get; set; }
         public DbSet<UserLikes> UserLikes { get; set; }
 
+        public string DbPath { get; }
+        public MusicPlayerServerContext()
+        {
+            var folder = Environment.SpecialFolder.LocalApplicationData;
+            var path = Environment.GetFolderPath(folder);
+            DbPath = System.IO.Path.Join(path, "Sounders.db");
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             
@@ -31,7 +39,7 @@ namespace MusicPlayerServer.Models
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseInMemoryDatabase("MusicPlayerServerContext");
+            optionsBuilder.UseSqlite($"Data Source={DbPath}"); 
         }
     }
 }
